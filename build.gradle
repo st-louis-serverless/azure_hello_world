@@ -1,0 +1,69 @@
+
+buildscript {
+    ext {
+        functionsCoreVersion = "1.0.0-beta-4"
+    }
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "com.microsoft.azure.functions:azure-functions-java-library:1.0.0-beta-4"
+        classpath 'com.microsoft.azure:azure-functions-gradle-plugin:1.0-SNAPSHOT'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'com.microsoft.azure.azurefunctions'
+
+
+import com.microsoft.azure.gradle.functions.*;
+
+dependencies {
+    compile 'com.microsoft.azure.functions:azure-functions-java-library:1.0.0-beta-4'
+}
+
+group 'com.stlserverless'
+version '1.0-SNAPSHOT'
+
+description = "azure-functions-gradle-demo-app"
+
+def functionAppName = "StlsHelloWorld"
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+azurefunctions {
+    authFile = '/Users/jackfrosch/.azure/sp-9fb63d5b-9fca-49b0-b70a-b6a9d90d9aef_20181106-001237.azureauth'
+}
+
+task azureFunctionsPackage(type: PackageTask) {
+    dependsOn jar
+    appName = functionAppName
+    resourceGroup = "stlsHelloWorld"
+    region = "centralus"
+}
+
+task azureFunctionsDeploy(type: DeployTask) {
+    appName = functionAppName
+    resourceGroup = "stlsHelloWorld"
+    region = "centralus"
+}
+
+task azureFunctionsRun(type: RunTask) {
+    appName = functionAppName
+    resourceGroup = "stlsHelloWorld"
+    region = "centralus"
+}
+
+task azureFunctionsAdd(type: AddTask) {
+    functionPackageName = "com.stlserverless"
+    functionTemplate = "HttpTrigger"
+}
+
+repositories {
+    maven { url "http://repo.maven.apache.org/maven2" }
+}
