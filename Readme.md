@@ -32,22 +32,69 @@ configure the CLI, Core Tools, .NET Core, etc.
 4. Add a Function
 	- Name it what you wish, but make it meaningful and URL-friendly
 	- We'll use JavaScript
-	
-		 
+			 
 5. Use this code for the function:
-	`
-	`
+	```
+	module.exports = async function (context, req) {
+        context.log('JavaScript HTTP trigger function processed a request.');
+    
+        context.log.info({'req.query': req.query})
+        context.log.info({'req.body': req.body})
+    
+        const min = req.query.min || (req.body && req.body.min) ? parseInt((req.query.min || req.body.min)) : 1
+        const max = req.query.max || (req.body && req.body.max) ? parseInt((req.query.max || req.body.max)) : 100
+        const randomVal = Math.floor(Math.random() * (max - min + 1) + min)
+    
+        const result = {
+            min: min,
+            max: max,
+            randomVal: randomVal 
+        }
+        
+        context.res = {
+            status: 200, // Defaults to 200, but included here for illustration
+            body: result
+        }
+        
+    }
+    ```
 	
 6. Review the code, taking note of
 	- The use of the context object for logging. In AWS Lambda, we just log to the console like normal
 	
 7. Click on the Integration node
-	- Note the allowed methods
+	- Note the allowed methods are GET and POST
 	
-8. Let's test the function in the Portal
-
+8. Test the function in the Portal
+    - On the right margin, you'll see the _Test_ tab
+    - Click it to open the Test pane
+    - Change the HTTP method to GET
+    - Add two parameters and values
+        
+        ```
+        min     50
+        max     75
+        ```
+    - Click the Run button
+        - Note the result in the output panel
+        - Note the console output
+        
+    - Now change the HTTP method to POST
+    - Add this in the body panel:
+    ```
+    {
+        "min": 50,
+        "max": 75
+    }
+    ```
+    - Run the test again and observe the output
+    
 9. Let's test the function from a browser
-	- Get the URL from the Function	 
+	- Get the URL from the Function panel by clicking on the link [</> Get function URL]()
+	- Enter the copied url in a browser followed by `?min=50&max=75`
+	- If using Chrome, you'll see the JSOn response in the main panel of the browser
+	
+10. Optional: test POST through **curl**, **httpie**, or **Postman** 	 
 
 ### Lab 2 (Take home): Create an Azure function via the CLI
 
@@ -94,13 +141,13 @@ app names will be globally unique.
 
 5. Read through the Java code
 
-6. Execute the Gradle package function task in the Other group
+6. Execute the Gradle **azureFunctionsPackage** task in the Other group
 
-7. Execute the Gradle run function task in the Other group
+7. Execute the Gradle **azureFunctionsRun** in the Other group to run your function locally
 	- Test a POST request against the localhost address
 	- Note: Only a plain test value need be supplied in the body 
 
-8. Execute the Gradle package deployment task in the Other group
+8. Execute the Gradle **azureFunctionsDeployment**  task in the Other group
 
 9. Go into the Azure Portal and review the artifacts created there under the resource group name you specified in `build.gradle`
 
